@@ -15,6 +15,7 @@ router.get("/allInterlocuteur", (req, res) => {
   });
 });
 
+//get interlocuteur by id
 router.get("/:_id", (req, res) => {
   Interlocutor.findById({ _id: req.params._id })
     .populate("client")

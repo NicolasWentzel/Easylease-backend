@@ -3,18 +3,18 @@ var router = express.Router();
 
 const Scenary = require("../models/scenary");
 const { checkBody } = require("../modules/checkBody");
-const User = require('../models/users')
-const Client = require('../models/client')
+const User = require("../models/users");
+const Client = require("../models/client");
 
-router.get("/test", (req,res) => {
-  res.json({result:true, message: "TEST PASSED !!"})
-})
+router.get("/test", (req, res) => {
+  res.json({ result: true, message: "TEST PASSED !!" });
+});
 
 router.get("/token/:token", (req, res) => {
   User.findOne({ token: req.params.token })
     .populate({
-      path: 'scenary',
-      populate: 'client'
+      path: "scenary",
+      populate: "client",
     })
     .then((data) => {
       if (data) {
@@ -45,7 +45,7 @@ router.post("/new", (req, res) => {
   }
 
   // Check if the scenary has not already been registered
-  Scenary.findOne({name: { $regex: new RegExp(req.body.name, 'i') }} ).then(
+  Scenary.findOne({ name: { $regex: new RegExp(req.body.name, "i") } }).then(
     (data) => {
       if (data === null) {
         const newScenary = new Scenary({
@@ -63,16 +63,15 @@ router.post("/new", (req, res) => {
         });
         newScenary.save().then((newScenary) => {
           Client.updateOne(
-            {_id: req.body.client},
-            {$push: { scenary: newScenary._id }} )
-            .then(data => console.log("update client",data)) 
+            { _id: req.body.client },
+            { $push: { scenary: newScenary._id } }
+          ).then((data) => console.log("update client", data));
           User.updateOne(
             { token: req.body.token },
-            {$push: { scenary: newScenary._id }},
-
-            ).then(() => {
+            { $push: { scenary: newScenary._id } }
+          ).then(() => {
             res.json({ result: true, contrat: newScenary });
-          })
+          });
         });
       } else {
         // Scenary already exists in database
@@ -113,7 +112,8 @@ router.delete("/:id", (req, res) => {
 });
 
 router.put("/update/:id", (req, res) => {
-  Scenary.updateOne({ _id: req.params.id },
+  Scenary.updateOne(
+    { _id: req.params.id },
     {
       client: req.body.client,
       name: req.body.name,
@@ -137,7 +137,5 @@ router.put("/update/:id", (req, res) => {
     });
   });
 });
-
-
 
 module.exports = router;

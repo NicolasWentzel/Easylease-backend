@@ -30,7 +30,7 @@ router.get("/:token", (req, res) => {
       if (data) {
         res.json({ result: true, userInfos: data });
       } else {
-        res.json({result: false,  message: "rien trouvé" });
+        res.json({ result: false, message: "rien trouvé" });
       }
     });
 });
@@ -44,7 +44,7 @@ router.get("/contrat/:_id", (req, res) => {
       if (data) {
         res.json({ result: true, contrat: data });
       } else {
-        res.json({ result: false, error : "Contrat pas trouvé" });
+        res.json({ result: false, error: "Contrat pas trouvé" });
       }
     });
 });
@@ -67,42 +67,40 @@ router.post("/addContrat", (req, res) => {
     res.json({ result: false, error: "Champs vides ou manquants !" });
     return;
   }
-  console.log("req body =>",req.body);
+  console.log("req body =>", req.body);
 
-        const newContrat = new Contrat({
-          client: req.body.client,
-          name: req.body.name,
-          interlocutor: req.body.interlocutor,
-          type: req.body.type,
-          duration: req.body.duration,
-          amount: req.body.amount,
-          creationDate: req.body.creationDate,
-          contratStart: req.body.contratStart,
-          contratEnd: req.body.contratEnd,
-          residualValue: req.body.residualValue,
-          links: req.body.links,
-          marge: req.body.marge,
-        });
-        newContrat.save().then((newContrat) => {
-          Client.updateOne(
-            {_id: req.body.client},
-            { $push: { contrats: newContrat._id } })
-            .then(data => console.log("update client",data)) 
-          User.updateOne(
-            { token: req.body.token },
-            { $push: { contrats: newContrat._id } },
-          
-          ).then((data) => {
-            if (data) {
-              console.log("update user", data);
-              res.json({ result: true, contrat: newContrat });
-            } else {
-              res.json({result: false, error: "User pas update"})
-            }
-          });
-        })
-    }
-  );
+  const newContrat = new Contrat({
+    client: req.body.client,
+    name: req.body.name,
+    interlocutor: req.body.interlocutor,
+    type: req.body.type,
+    duration: req.body.duration,
+    amount: req.body.amount,
+    creationDate: req.body.creationDate,
+    contratStart: req.body.contratStart,
+    contratEnd: req.body.contratEnd,
+    residualValue: req.body.residualValue,
+    links: req.body.links,
+    marge: req.body.marge,
+  });
+  newContrat.save().then((newContrat) => {
+    Client.updateOne(
+      { _id: req.body.client },
+      { $push: { contrats: newContrat._id } }
+    ).then((data) => console.log("update client", data));
+    User.updateOne(
+      { token: req.body.token },
+      { $push: { contrats: newContrat._id } }
+    ).then((data) => {
+      if (data) {
+        console.log("update user", data);
+        res.json({ result: true, contrat: newContrat });
+      } else {
+        res.json({ result: false, error: "User pas update" });
+      }
+    });
+  });
+});
 
 // :id correspond à l'ID du contrat
 router.put("/addInterlocutor/:id", (req, res) => {
